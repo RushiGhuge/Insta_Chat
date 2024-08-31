@@ -21,7 +21,7 @@ export class UserDto {
   phone_no: string;
 
   @IsOptional()
-  address: string;
+  profilePic: string;
 
   @IsNumber()
   age: number;

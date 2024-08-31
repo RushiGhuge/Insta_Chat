@@ -7,11 +7,16 @@ import { UserDto, UserLoginDto } from './Dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
   private readonly saltRounds = 10; // Number of salt rounds for bcrypt
-  constructor(@InjectModel('User') private userModel: Model<UserDto>) {}
+  constructor(
+    @InjectModel('User') private userModel: Model<UserDto>,
+    private readonly jwtService: JwtService,
+  ) {}
 
   /**
    * Creates a new user in the database.
@@ -19,16 +24,23 @@ export class AuthService {
    * @returns {Promise<User>} - The newly created user object.
    */
   async createNewUser(userData: UserDto) {
-    const userExists = await this.userModel.exists({ email: userData.email });
+    const { email, gender, name, phone_no } = userData;
+    const userExists = await this.userModel.exists({ email });
     if (userExists) {
       throw new ConflictException(`Email already in use`);
     }
     const hashedPassword = await this.hashPassword(userData.password);
+    const profilePic =
+      gender === 'male'
+        ? `https://avatar.iran.liara.run/public/boy?username=${name}`
+        : `https://avatar.iran.liara.run/public/girl?username=${name}`;
     const newUser = new this.userModel({
       ...userData,
       password: hashedPassword,
+      profilePic,
     });
-    return newUser.save();
+    newUser.save();
+    return this.jwtService.sign({ email, name, gender, profilePic, phone_no });
   }
 
   /**
@@ -36,12 +48,18 @@ export class AuthService {
    * @param {UserLoginDto} userData - The login data including email and password.
    * @returns {Promise<any>} - An object containing a success message and user details if credentials are valid.
    */
-  async loginUser(userData: UserLoginDto) {
+  async loginUser(userData: UserLoginDto, responce: Response) {
     const user = await this.validateUser(userData.email, userData.password);
     if (!user) {
       throw new NotFoundException(`Invalid credentials`);
     }
-    return { message: 'Login successful', ...user };
+    const token = this.jwtService.sign({ ...user });
+    responce.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    return token;
   }
 
   /**
