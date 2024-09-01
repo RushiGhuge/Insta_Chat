@@ -23,8 +23,8 @@ export class AuthService {
    * @param {UserDto} userData - The data for the user to be created. Includes email and password.
    * @returns {Promise<User>} - The newly created user object.
    */
-  async createNewUser(userData: UserDto) {
-    const { email, gender, name, phone_no } = userData;
+  async createNewUser(userData: UserDto, responce: Response) {
+    const { email, gender, name } = userData;
     const userExists = await this.userModel.exists({ email });
     if (userExists) {
       throw new ConflictException(`Email already in use`);
@@ -39,8 +39,17 @@ export class AuthService {
       password: hashedPassword,
       profilePic,
     });
-    newUser.save();
-    return this.jwtService.sign({ email, name, gender, profilePic, phone_no });
+    await newUser.save();
+
+    const token = this.jwtService.sign({
+      ...newUser.toObject(),
+    });
+    responce.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    return token;
   }
 
   /**
@@ -81,8 +90,8 @@ export class AuthService {
   }
 
   // Method to validate a user during login
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.userModel.findOne({ email }).exec();
+  async validateUser(email: string, password: string) {
+    const user = (await this.userModel.findOne({ email }).exec()).toObject();
     if (user && (await this.comparePasswords(password, user.password))) {
       return user;
     }

@@ -16,8 +16,11 @@ export class AuthController {
   constructor(public authService: AuthService) {}
 
   @Post('register')
-  newUserRegistration(@Body() body: UserDto) {
-    return this.authService.createNewUser(body);
+  newUserRegistration(
+    @Body() body: UserDto,
+    @Res({ passthrough: true }) responce: Response,
+  ) {
+    return this.authService.createNewUser(body, responce);
   }
 
   @Post('login')

@@ -14,7 +14,7 @@ import { JwtMiddleware } from 'src/jwt/jwt.middleware';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET') || 'defaultSecret',
-        signOptions: { expiresIn: '1d' },
+        signOptions: { expiresIn: '15d' },
       }),
       inject: [ConfigService],
     }),

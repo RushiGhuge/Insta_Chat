@@ -10,4 +10,4 @@ export const ConversationSchema = new Schema(
   },
 );
 
-export const Conversation = mongoose.model('Message', ConversationSchema);
+export const Conversation = mongoose.model('Conversation', ConversationSchema);
