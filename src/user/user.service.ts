@@ -9,7 +9,7 @@ export class UserService {
 
   fetchUsers(request: Request) {
     try {
-      const logiedInUser = request['user'];
+      const logiedInUser = request['user']._id;
       return this.userModel
         .find({ _id: { $ne: logiedInUser } })
         .select('-password');

@@ -42,14 +42,13 @@ export class AuthService {
     await newUser.save();
 
     const token = this.jwtService.sign({
-      ...newUser.toObject(),
+      ...newUser?.toObject(),
     });
     responce.cookie('jwt', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'none',
     });
-    return token;
+    return { token };
   }
 
   /**
@@ -64,11 +63,10 @@ export class AuthService {
     }
     const token = this.jwtService.sign({ ...user });
     responce.cookie('jwt', token, {
-      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
     });
-    return token;
+    return { token };
   }
 
   /**
@@ -91,7 +89,7 @@ export class AuthService {
 
   // Method to validate a user during login
   async validateUser(email: string, password: string) {
-    const user = (await this.userModel.findOne({ email }).exec()).toObject();
+    const user = (await this.userModel.findOne({ email }).exec())?.toObject();
     if (user && (await this.comparePasswords(password, user.password))) {
       return user;
     }

@@ -2,12 +2,18 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MessageDto } from './Dto/message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { SocketGateway } from 'src/gateway/socket.gateway';
+import { Server } from 'socket.io';
+import { WebSocketServer } from '@nestjs/websockets';
 
 @Injectable()
 export class MessageService {
+  @WebSocketServer()
+  server: Server;
   constructor(
     @InjectModel('Message') private MessageModel: Model<MessageDto>,
     @InjectModel('Conversation') private ConversationModel: Model<any>,
+    private getway: SocketGateway,
   ) {}
 
   async sendMessage(body: MessageDto, receiverId: string, req: Request) {
@@ -33,6 +39,16 @@ export class MessageService {
         conversation.messages.push(newMessage._id);
       }
       await Promise.all([conversation.save(), newMessage.save()]);
+
+      // Socket IO connection emits the message
+
+      const receiverSocketID = this.getway.getRecieverSocketId(receiverId);
+
+      if (receiverSocketID) {
+        console.log('receiverSocketID', receiverSocketID);
+        this.getway.handleMessage(newMessage, receiverSocketID);
+      }
+
       return newMessage;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -41,7 +57,6 @@ export class MessageService {
 
   async getMessages(receiverId: string, req: Request) {
     const user = req['user'];
-
     const senderId = user._id;
     const conversation = await this.ConversationModel.findOne({
       participants: { $all: [senderId, receiverId] },

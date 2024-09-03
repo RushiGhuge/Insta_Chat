@@ -1,4 +1,4 @@
-import { OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import {
   MessageBody,
   SubscribeMessage,
@@ -7,7 +7,17 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
-@WebSocketGateway()
+export const userSocketMap = {};
+
+@Injectable()
+@WebSocketGateway({
+  cors: {
+    origin: ['http://localhost:4200'],
+    method: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  },
+  transports: ['websocket', 'polling'],
+})
 export class SocketGateway implements OnModuleInit {
   @WebSocketServer()
   server: Server;
@@ -15,19 +25,36 @@ export class SocketGateway implements OnModuleInit {
   onModuleInit() {
     this.server.on('connection', (socket) => {
       console.log('Connected : ', socket?.id);
+      const userId = socket.handshake.query.userId as string;
+      if (userId.length > 0 && userId !== undefined) {
+        userSocketMap[userId] = socket?.id;
+        this.server.emit('getOnlineUsers', Object.keys(userSocketMap));
+      }
 
       socket.on('disconnect', () => {
         console.log('Disconnected : ', socket?.id);
+        delete userSocketMap[userId];
+        console.log(userSocketMap);
+        this.server.emit('getOnlineUsers', Object.keys(userSocketMap));
       });
     });
   }
 
   @SubscribeMessage('message')
-  handleMessage(@MessageBody() body: any) {
+  handleMessage(@MessageBody() body: any, receiverSocketID: string) {
     console.log(body);
-    this.server.emit('onMessage', {
-      message: 'newMessage',
+    this.server.to(receiverSocketID).emit('message', {
+      message: 'message',
       content: body,
     });
+    // this.server.emit('message', {
+    //   message: 'message',
+    //   content: body,
+    // });
+  }
+
+  getRecieverSocketId(receiverId: string) {
+    console.log(userSocketMap);
+    return userSocketMap[receiverId];
   }
 }

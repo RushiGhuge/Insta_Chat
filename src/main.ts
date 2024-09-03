@@ -13,6 +13,11 @@ async function bootstrap() {
       transform: true, // Automatically transform payloads into DTO instances
     }),
   );
+  // Enable CORS with default options
+  app.enableCors({
+    origin: 'http://localhost:4200', // Replace with your frontend URL
+    credentials: true,
+  });
   await app.listen(3000);
 }
 bootstrap();

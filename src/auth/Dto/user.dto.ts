@@ -17,13 +17,14 @@ export class UserDto {
   @IsNotEmpty()
   gender: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   phone_no: string;
 
   @IsOptional()
   profilePic: string;
 
   @IsNumber()
+  @IsOptional()
   age: number;
 
   @IsNotEmpty()
