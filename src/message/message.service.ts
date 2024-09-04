@@ -34,6 +34,7 @@ export class MessageService {
         senderId,
         receiverId,
         message,
+        conversationId: conversation._id,
       });
       if (newMessage) {
         conversation.messages.push(newMessage._id);
@@ -41,12 +42,12 @@ export class MessageService {
       await Promise.all([conversation.save(), newMessage.save()]);
 
       // Socket IO connection emits the message
-
       const receiverSocketID = this.getway.getRecieverSocketId(receiverId);
+      const senderSocketID = this.getway.getRecieverSocketId(senderId);
 
       if (receiverSocketID) {
-        console.log('receiverSocketID', receiverSocketID);
-        this.getway.handleMessage(newMessage, receiverSocketID);
+        console.log('receiverSocketID', [receiverSocketID, senderSocketID]);
+        this.getway.handleMessage(newMessage, [receiverSocketID]);
       }
 
       return newMessage;
@@ -61,7 +62,7 @@ export class MessageService {
     const conversation = await this.ConversationModel.findOne({
       participants: { $all: [senderId, receiverId] },
     }).populate('messages');
-    if (!conversation) return [];
-    return conversation.messages;
+    if (!conversation) return null;
+    return conversation;
   }
 }

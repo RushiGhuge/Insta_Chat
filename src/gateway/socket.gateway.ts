@@ -40,12 +40,15 @@ export class SocketGateway implements OnModuleInit {
     });
   }
 
+  // socket ids are troring the socket id which needs to emmit...
   @SubscribeMessage('message')
-  handleMessage(@MessageBody() body: any, receiverSocketID: string) {
+  handleMessage(@MessageBody() body: any, socketIds: string[]) {
     console.log(body);
-    this.server.to(receiverSocketID).emit('message', {
-      message: 'message',
-      content: body,
+    socketIds.forEach((socketId) => {
+      this.server.to(socketId).emit('message', {
+        message: 'message',
+        content: body,
+      });
     });
     // this.server.emit('message', {
     //   message: 'message',
