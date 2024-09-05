@@ -8,7 +8,7 @@ export class JwtMiddleware implements NestMiddleware {
   constructor(private readonly jwtService: JwtService) {}
 
   async use(req: any, res: any, next: () => void) {
-    const token = req.cookies['jwt'];
+    const token = req.cookies?.jwt;
     if (token) {
       try {
         const payload = await this.jwtService.verifyAsync(token);
