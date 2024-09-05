@@ -2,10 +2,10 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from 'src/Schema/user.schema';
+import { UserSchema } from '../Schema/user.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtMiddleware } from 'src/jwt/jwt.middleware';
+import { JwtMiddleware } from '../jwt/jwt.middleware';
 
 @Module({
   imports: [

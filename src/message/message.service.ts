@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MessageDto } from './Dto/message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { SocketGateway } from 'src/gateway/socket.gateway';
+import { SocketGateway } from '../gateway/socket.gateway';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
 
