@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-// import * as cookieParser from 'cookie-parser';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.use(cookieParser());
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Automatically remove properties that do not have any decorators
@@ -15,8 +15,8 @@ async function bootstrap() {
   );
   // Enable CORS with default options
   app.enableCors({
-    origin: '*', // Replace with your frontend URL
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: 'http://localhost:4200', // Replace with your frontend URL
+    methods: ['GET', 'POST'],
     credentials: true,
   });
   await app.listen(process.env.PORT || 3000);

@@ -12,10 +12,10 @@ export const userSocketMap = {};
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: ['*'],
+    origin: ['http://localhost:4200'],
     method: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['content-type'],
-    credentials: true,
+    credentials: false,
   },
   transports: ['websocket', 'polling'],
 })
