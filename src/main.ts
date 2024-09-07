@@ -16,9 +16,8 @@ async function bootstrap() {
   );
   // Enable CORS with default options
   app.enableCors({
-    origin: 'http://localhost:4200', // Replace with your frontend URL
+    origin: 'http://localhost:4200', // Frontend URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
     allowedHeaders: 'Content-Type, Authorization',
   });
   await app.listen(process.env.PORT || 3000);
