@@ -14,10 +14,11 @@ async function bootstrap() {
       transform: true, // Automatically transform payloads into DTO instances
     }),
   );
+
   // Enable CORS with default options
   app.enableCors({
-    origin: ['http://localhost:4200', 'https://insta-chat-six.vercel.app'], // Replace with your frontend URL
-    methods: '*',
+    origin: ['http://localhost:4200'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
