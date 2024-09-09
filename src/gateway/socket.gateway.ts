@@ -8,7 +8,6 @@ import {
 import { Server } from 'socket.io';
 
 export const userSocketMap = {};
-
 @Injectable()
 @WebSocketGateway({
   cors: {
