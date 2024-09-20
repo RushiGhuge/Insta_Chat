@@ -47,7 +47,7 @@ export class MessageService {
 
       if (receiverSocketID) {
         console.log('receiverSocketID', [receiverSocketID, senderSocketID]);
-        this.getway.handleMessage(newMessage, [receiverSocketID]);
+        // this.getway.handleMessage(newMessage, [receiverSocketID]);
       }
 
       return newMessage;

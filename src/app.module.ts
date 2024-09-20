@@ -6,8 +6,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { MessageModule } from './message/message.module';
 import { UserModule } from './user/user.module';
-import { GatewayModule } from './gateway/gateway.module';
-import { SocketGateway } from './gateway/socket.gateway';
 
 @Module({
   imports: [
@@ -19,9 +17,8 @@ import { SocketGateway } from './gateway/socket.gateway';
     AuthModule,
     MessageModule,
     UserModule,
-    GatewayModule,
   ],
   controllers: [AppController],
-  providers: [AppService, SocketGateway],
+  providers: [AppService],
 })
 export class AppModule {}

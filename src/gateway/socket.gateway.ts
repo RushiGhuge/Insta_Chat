@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import {
-  MessageBody,
-  SubscribeMessage,
+  // MessageBody,
+  // SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -42,20 +42,20 @@ export class SocketGateway implements OnModuleInit {
   }
 
   // socket ids are troring the socket id which needs to emmit...
-  @SubscribeMessage('message')
-  handleMessage(@MessageBody() body: any, socketIds: string[]) {
-    console.log(body);
-    socketIds.forEach((socketId) => {
-      this.server.to(socketId).emit('message', {
-        message: 'message',
-        content: body,
-      });
-    });
-    // this.server.emit('message', {
-    //   message: 'message',
-    //   content: body,
-    // });
-  }
+  // @SubscribeMessage('message')
+  // handleMessage(@MessageBody() body: any, socketIds: string[]) {
+  //   console.log(body);
+  //   socketIds.forEach((socketId) => {
+  //     this.server.to(socketId).emit('message', {
+  //       message: 'message',
+  //       content: body,
+  //     });
+  //   });
+  // this.server.emit('message', {
+  //   message: 'message',
+  //   content: body,
+  // });
+  // }
 
   getRecieverSocketId(receiverId: string) {
     console.log(userSocketMap);
