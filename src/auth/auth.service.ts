@@ -46,7 +46,7 @@ export class AuthService {
     });
     responce.cookie('jwt', token, {
       httpOnly: true,
-      secure: true, // Use true if running on HTTPS
+      secure: false, // Use true if running on HTTPS
       sameSite: 'none', // Necessary for cross-origin requests
       maxAge: 24 * 60 * 60 * 1000, // 1 day in milliseconds
     });
