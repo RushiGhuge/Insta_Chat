@@ -13,10 +13,12 @@ export class UserService {
 
   fetchUsers(request: Request) {
     try {
-      const logiedInUser = request['user']?._id;
-      if (logiedInUser)
+      const loggedInUser = request['user']?._id;
+      console.log('logged in user', loggedInUser);
+
+      if (loggedInUser)
         return this.userModel
-          .find({ _id: { $ne: logiedInUser } })
+          .find({ _id: { $ne: loggedInUser } })
           .select('-password');
 
       throw new NotFoundException('Please Login again');
