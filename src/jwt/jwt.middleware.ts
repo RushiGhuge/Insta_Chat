@@ -8,10 +8,14 @@ export class JwtMiddleware implements NestMiddleware {
   constructor(private readonly jwtService: JwtService) {}
 
   async use(req: any, res: any, next: () => void) {
-    const token = req.cookies?.jwt;
-    if (token) {
+    const authHeader = req.headers['authorization'];
+    console.log(authHeader);
+    // const token = authHeader;
+    if (authHeader) {
       try {
-        const payload = await this.jwtService.verifyAsync(token);
+        const payload = await this.jwtService.verifyAsync(authHeader);
+        console.log(payload);
+
         req.user = payload; // Attach user payload to request object
       } catch (err) {
         this.logger.error('Invalid token', err);

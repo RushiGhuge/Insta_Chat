@@ -17,11 +17,10 @@ async function bootstrap() {
 
   // Enable CORS with default options
   app.enableCors({
-    origin: ['http://localhost:4200', 'http://localhost:4200'],
+    origin: ['http://localhost:4200', 'https://localhost:4200'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
-    exposedHeaders: ['set-cookie'],
   });
   await app.listen(process.env.PORT || 3000);
 }
