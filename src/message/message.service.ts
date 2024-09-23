@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { SocketGateway } from '../gateway/socket.gateway';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class MessageService {
@@ -13,6 +14,7 @@ export class MessageService {
   constructor(
     @InjectModel('Message') private MessageModel: Model<MessageDto>,
     @InjectModel('Conversation') private ConversationModel: Model<any>,
+    public httpService: HttpService,
     private getway: SocketGateway,
   ) {}
 
@@ -21,6 +23,13 @@ export class MessageService {
       const { message } = body;
       const user = req['user'];
       const senderId = user._id;
+      console.warn(
+        '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4' +
+          ' ' +
+          user._id +
+          '  ' +
+          message,
+      );
 
       let conversation = await this.ConversationModel.findOne({
         participants: { $all: [senderId, receiverId] },
@@ -40,14 +49,21 @@ export class MessageService {
         conversation.messages.push(newMessage._id);
       }
       await Promise.all([conversation.save(), newMessage.save()]);
+      console.log('calling from frontend');
 
-      // Socket IO connection emits the message
-      const receiverSocketID = this.getway.getRecieverSocketId(receiverId);
-      const senderSocketID = this.getway.getRecieverSocketId(senderId);
+      // SocketgIO connection emits the message
+      // const receiverSocketID = this.getway.getRecieverSocketId(receiverId);
+      // const senderSocketID = this.getway.getRecieverSocketId(senderId);
 
-      if (receiverSocketID) {
-        console.log('receiverSocketID', [receiverSocketID, senderSocketID]);
+      if (receiverId) {
+        console.error('receiverSocketID ^^^^^^^^^^^^^^^^^^^^^', receiverId);
         // this.getway.handleMessage(newMessage, [receiverSocketID]);
+        this.httpService
+          .post('http://localhost:3000/send_msg_event', {
+            body: newMessage,
+            receiverId,
+          })
+          .subscribe((s) => console.log(s));
       }
 
       return newMessage;
