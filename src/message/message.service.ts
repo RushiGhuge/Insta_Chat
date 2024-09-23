@@ -6,7 +6,7 @@ import { SocketGateway } from '../gateway/socket.gateway';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
 import { HttpService } from '@nestjs/axios';
-import { CHAT_BACKEND_URL } from 'src/constants/constants';
+import { CHAT_BACKEND_URL } from '../../src/constants/constants';
 
 @Injectable()
 export class MessageService {
@@ -59,8 +59,9 @@ export class MessageService {
       if (receiverId) {
         console.error('receiverSocketID ^^^^^^^^^^^^^^^^^^^^^', receiverId);
         // this.getway.handleMessage(newMessage, [receiverSocketID]);
+
         this.httpService
-          .post(CHAT_BACKEND_URL, {
+          .post(`${CHAT_BACKEND_URL}/send_msg_event`, {
             body: newMessage,
             receiverId,
           })
