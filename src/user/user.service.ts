@@ -14,8 +14,6 @@ export class UserService {
   fetchUsers(request: Request) {
     try {
       const loggedInUser = request['user']?._id;
-      console.log('logged in user', loggedInUser);
-
       if (loggedInUser)
         return this.userModel
           .find({ _id: { $ne: loggedInUser } })
@@ -25,5 +23,9 @@ export class UserService {
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
+  }
+
+  getUserById(id: string) {
+    return this.userModel.findById(id);
   }
 }

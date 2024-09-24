@@ -6,6 +6,7 @@ export const MessageSchema = new Schema(
     receiverId: { type: Schema.ObjectId, required: true, ref: 'User' },
     message: { type: String, required: true },
     conversationId: { type: Schema.ObjectId, required: true },
+    senderName: { type: String },
   },
   {
     timestamps: true,

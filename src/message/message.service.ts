@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
 import { HttpService } from '@nestjs/axios';
 import { CHAT_BACKEND_URL } from '../../src/constants/constants';
+// import { UserService } from 'src/user/user.service'
 
 @Injectable()
 export class MessageService {
@@ -24,14 +25,7 @@ export class MessageService {
       const { message } = body;
       const user = req['user'];
       const senderId = user._id;
-      console.warn(
-        '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$4' +
-          ' ' +
-          user._id +
-          '  ' +
-          message,
-      );
-
+      console.log(user);
       let conversation = await this.ConversationModel.findOne({
         participants: { $all: [senderId, receiverId] },
       });
@@ -40,34 +34,32 @@ export class MessageService {
           participants: [senderId, receiverId],
         });
       }
+      // this.userService.getUserById(senderId);
       const newMessage = new this.MessageModel({
         senderId,
         receiverId,
         message,
         conversationId: conversation._id,
+        senderName: user?.name,
       });
       if (newMessage) {
         conversation.messages.push(newMessage._id);
+      } else {
+        console.log('hi');
       }
       await Promise.all([conversation.save(), newMessage.save()]);
-      console.log('calling from frontend');
-
-      // SocketgIO connection emits the message
-      // const receiverSocketID = this.getway.getRecieverSocketId(receiverId);
-      // const senderSocketID = this.getway.getRecieverSocketId(senderId);
+      console.log(newMessage);
 
       if (receiverId) {
         console.error('receiverSocketID ^^^^^^^^^^^^^^^^^^^^^', receiverId);
         // this.getway.handleMessage(newMessage, [receiverSocketID]);
-
         this.httpService
           .post(`${CHAT_BACKEND_URL}/send_msg_event`, {
             body: newMessage,
             receiverId,
           })
-          .subscribe((s) => console.log(s));
+          .subscribe();
       }
-
       return newMessage;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
