@@ -2,7 +2,6 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { MessageDto } from './Dto/message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { SocketGateway } from '../gateway/socket.gateway';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
 import { HttpService } from '@nestjs/axios';
@@ -17,7 +16,6 @@ export class MessageService {
     @InjectModel('Message') private MessageModel: Model<MessageDto>,
     @InjectModel('Conversation') private ConversationModel: Model<any>,
     public httpService: HttpService,
-    private getway: SocketGateway,
   ) {}
 
   async sendMessage(body: MessageDto, receiverId: string, req: Request) {
@@ -50,16 +48,15 @@ export class MessageService {
       await Promise.all([conversation.save(), newMessage.save()]);
       console.log(newMessage);
 
-      if (receiverId) {
-        console.error('receiverSocketID ^^^^^^^^^^^^^^^^^^^^^', receiverId);
-        // this.getway.handleMessage(newMessage, [receiverSocketID]);
-        this.httpService
-          .post(`${CHAT_BACKEND_URL}/send_msg_event`, {
-            body: newMessage,
-            receiverId,
-          })
-          .subscribe();
-      }
+      // call chat-backend to trigger the event with new message for the receiver
+      console.error('receiverSocketID ^^^^^^^^^^^^^^^^^^^^^', receiverId);
+      this.httpService
+        .post(`${CHAT_BACKEND_URL}/send_msg_event`, {
+          body: newMessage,
+          receiverId,
+        })
+        .subscribe();
+
       return newMessage;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
